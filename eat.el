@@ -5141,13 +5141,12 @@ selection, or nil if none."
                           'em)))))))
 
 (defun eat--set-cwd (_ host cwd)
-  "Set CWD as the current working directory (`default-directory').
-
-If HOST isn't the host Emacs is running on, don't do anything."
-  (when (and eat-enable-directory-tracking
-             (string= host (system-name)))
-    (ignore-errors
-      (cd-absolute cwd))))
+  (let*
+    ((_eat-pieces (split-string default-directory ":"))
+      (_eat-pieces-front (butlast _eat-pieces))
+      (cwd-2 (car (last (split-string cwd ":"))))
+      (_eat-dir-new (mapconcat 'identity (append _eat-pieces-front (list cwd-2)) ":")))
+    (setq default-directory _eat-dir-new)))
 
 (defun eat--set-cwd-uic (host path)
   "Set PATH to the CWD, if HOST is same as the host name."
